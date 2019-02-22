@@ -80,15 +80,9 @@ function addInventory() {
         .then(function (answer) {
             var id = answer.stockId
             var updateStock = parseInt(answer.quantity);
-            var query = ("UPDATE products SET ? WHERE ?")
-            connection.query(query, function (err, result) {
-                [
-                    { stock_quantity: updateStock },
-                    { id: id }];
+            connection.query("UPDATE products SET ? WHERE ?", { stock_quantity: updateStock, id: id }),
                 console.log("Updated!")
-                if (err) throw err;
-                start();
-            })
+            start();
         })
 }
 function addNewProducts() {

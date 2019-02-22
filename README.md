@@ -29,3 +29,6 @@ If you chose to add inventory you will be prompted to input the id of the itemca
 Finally you can choose to add a new item
 You will be prompted tp enter info about that item
 
+I COULD GET THIS PART TO WORK BECAUSE I KEEP GETTING THE ERROR 
+ER_NO_DEFAULT_FOR_FIELD: Field 'department_name' doesn't have a default value
+I googled how to fix but everything I tried continued not to work.

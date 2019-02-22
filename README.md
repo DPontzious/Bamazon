@@ -27,5 +27,5 @@ If you chose to add inventory you will be prompted to input the id of the itemca
 [img](Bamazon/images/fifthPhoto.png)
 
 Finally you can choose to add a new item
-You will be prompted tp enter info about that item
-Then the information will be added to the list
+You will be prompted to enter info about that item
+Once you enter info on the item if will be displayed to the table

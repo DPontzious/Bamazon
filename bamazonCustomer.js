@@ -1,19 +1,9 @@
 var mysql = require("mysql");
 var inquirer = require("inquirer");
-
-// var WordTable = require('word-table');
-
-// create the connection information for the sql database
 var connection = mysql.createConnection({
     host: "localhost",
-
-    // Your port; if not 3306
     port: 8889,
-
-    // Your username
     user: "root",
-
-    // Your password
     password: "root",
     database: "bamazonDB"
 });
@@ -21,25 +11,38 @@ var connection = mysql.createConnection({
 connection.connect(function (err) {
     if (err) throw err;
     // run the start function after the connection is made to prompt the user
-    // console.log("hello");z
-    itemsForSaleInq();
+    console.log("hello");
+    // itemsForSaleInq();
+    start();
 });
+function start() {
+    inquirer
+        .prompt({
+            name: "shopOrExit",
+            type: "list",
+            message: "Would you like to Shop for an item or Exit?",
+            choices: ["SHOP", "EXIT"]
+        })
+        .then(function (answer) {
+            // Based on the user's answer, this either calls the shop or the exit functions:
+            if (answer.shopOrExit === "SHOP") {
+                getItemsForSale();
+                console.log("-------------------------------------")
+                itemsForSaleInq();
+            } else {
+                connection.end();
+            }
+        });
+}
 
+function getItemsForSale() {
+    connection.query("SELECT * FROM products", function (err, result) {
+        if (err) throw err;
+        console.table(result);
+    })
+}
 function itemsForSaleInq(result) {
     inquirer.prompt([
-        // {
-        // name: "choice",
-        // type: "rawlist",
-        // choices: function () {
-        //     var choiceArray = [];
-        //     for (var i = 0; i < result.length; i++) {
-        //         choiceArray.push(result[i].product_name);
-        //     }
-        //     return choiceArray;
-        //     // console.table(choiceArray);
-        // },
-        // message: "What would you like to purchase??? "
-        // },
         {
             name: "itemPurchased",
             type: "input",
@@ -61,29 +64,41 @@ function itemsForSaleInq(result) {
                 if (quanGreaterThanStock) {
                     // THEN LOG ERROR
                     console.log("Sorry there are only " + result[0].stock_quantity + " left")
+
                 }// ELSE 
                 else {
                     // LOG SUCCESSFULL
+
                     console.log("Successfully purchased!")
                     // UPDATE STOCK QUANTITY 
                     var updateQuantity = (result[0].stock_quantity - parseInt(answer.quantity))
+                    // console.log('updateQuantity', updateQuantity);
+                    // console.log('answer.itemPurchased', answer.itemPurchased);
                     updateStockQuantity(updateQuantity, answer.itemPurchased)
+                    customerTotal(answer.itemPurchased, answer.quantity);
+                    // customerTotal();
+                    // console.log("==============================")
+                    start();
                 }
             })
         });
 };
 
-function updateStockQuantity(newQuantity, stockid) {
-    console.log(newQuantity)
-    connection.query("UPDATE products SET stock_quantity = ? WHERE id = ?"
-    [newQuantity, stockid])
+function updateStockQuantity(newQuantity, stockId) {
+    connection.query("UPDATE products SET ? WHERE ?",
+        [{ stock_quantity: newQuantity },
+        { id: stockId }])
+    // start();
 }
-
-function getItemsForSale() {
-    connection.query("SELECT * FROM products", function (err, result) {
-        if (err) throw err;
-        itemsForSaleInq(result);
-        console.log("TEST")
-        // console.log("hello", results)
-    })
+function customerTotal(stockId, newQuantity) {
+    connection.query('SELECT price FROM products WHERE ?', { id: stockId },
+        function (err, res) {
+            for (var i = 0; i < res.length; i++) {
+                if (err) throw err;
+                // console.log(res[0].price)
+                var priceTag = res[0].price;
+                var total = priceTag * newQuantity;
+                console.log("Your total is", total)
+            }
+        })
 }

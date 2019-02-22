@@ -116,10 +116,12 @@ function addNewProducts() {
         .then(function (answer) {
             console.log(answer.department)
             connection.query("INSERT INTO products SET ?",
-                [{ product_name: answer.product },
-                { department_name: answer.department },
-                { price: answer.price },
-                { stock_quantity: answer.quantity }]);
+                {
+                    product_name: answer.product,
+                    department_name: answer.department,
+                    price: answer.price,
+                    stock_quantity: answer.quantity
+                });
             console.log("Added New Product")
             productsForSale()
         })
